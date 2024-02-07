@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
@@ -44,6 +46,19 @@ Future<pw.Document> generatePdf() async {
 
 void printPdf() async {
   final doc = await generatePdf();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: const Text('PDF Printer App')),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () => printPdf(),
+            child: const Text('Invoke Direct Print'),
+          ),
+        ),
+      ),
+    );
+  }
 
   await Printing.directPrintPdf(
     printer: const Printer(url: 'http://127.0.0.1:631/printers/PDF'),
