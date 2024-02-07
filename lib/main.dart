@@ -1,75 +1,83 @@
-import 'dart:js';
+// class MyApp extends StatelessWidget {
+//   void printPdf() async {
+//   final doc = await generatePdf();
+//   Printer? pri = await Printing.pickPrinter(context: context);
+//   await Printing.directPrintPdf(
+//     printer: pri!,
+//     onLayout: (PdfPageFormat format) async => doc.save(),
+//   );
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: Scaffold(
+//         appBar: AppBar(title: const Text('PDF Printer App')),
+//         body: Center(
+//           child: ElevatedButton(
+//             onPressed: () => printPdf(),
+//             child: const Text('Invoke Direct Print'),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('PDF Printer App')),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () => printPdf(),
-            child: const Text('Invoke Direct Print'),
-          ),
+        appBar: AppBar(
+          title: const Text('PDF Printer App'),
         ),
+        body: const MyHomePage(),
       ),
     );
   }
 }
 
-Future<pw.Document> generatePdf() async {
-  final pdf = pw.Document();
-  pdf.addPage(
-    pw.Page(
-      build: (pw.Context context) {
-        return pw.Center(
-          child: pw.Text('Hello, PDF!'),
-        );
-      },
-    ),
-  );
-  return pdf;
-}
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
 
-// Future<PrintingInfo> info() {
-//   Printer(url: url)
-// }
-
-void printPdf() async {
-  final doc = await generatePdf();
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('PDF Printer App')),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () => printPdf(),
-            child: const Text('Invoke Direct Print'),
-          ),
-        ),
+    return Center(
+      child: ElevatedButton(
+        onPressed: () => printPdf(context),
+        child: const Text('Print PDF'),
       ),
     );
   }
 
-  await Printing.directPrintPdf(
-    printer: const Printer(url: 'http://127.0.0.1:631/printers/PDF'),
-    onLayout: (PdfPageFormat format) async => doc.save(),
-  );
+  Future<void> printPdf(BuildContext context) async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+          build: (pw.Context context) =>
+              pw.Center(child: pw.Text('Hello, PDF!'))),
+    );
+
+    final Uint8List bytes = await pdf.save();
+    Printer? printer = await Printing.pickPrinter(context: context);
+
+    if (printer != null) {
+      await Printing.directPrintPdf(
+        printer: printer,
+        onLayout: (PdfPageFormat format) async => bytes,
+      );
+    }
+  }
 }
-
-// void printPdf() async {
-//   final pdf = await generatePdf();
-
-//   await Printing.layoutPdf(
-//     onLayout: (PdfPageFormat format) async => pdf.save(),
-//   );
-// }
