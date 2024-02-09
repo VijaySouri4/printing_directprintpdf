@@ -71,13 +71,22 @@ class MyHomePage extends StatelessWidget {
     );
 
     final Uint8List bytes = await pdf.save();
-    Printer? printer = await Printing.pickPrinter(context: context);
+    //Printer? printer = await Printing.pickPrinter(context: context);
 
-    if (printer != null) {
-      await Printing.directPrintPdf(
-        printer: printer,
-        onLayout: (PdfPageFormat format) async => bytes,
-      );
-    }
+    await Printing.directPrintPdf(
+      // printer: printer,
+      printer: Printer(
+          url:
+              'PDF'), // Give name when running locally over CUPS. User netowrk address for network printer.
+      onLayout: (PdfPageFormat format) async => bytes,
+    );
+
+    // if (printer != null) {
+    //   await Printing.directPrintPdf(
+    //     // printer: printer,
+    //     printer: Printer(url: url),
+    //     onLayout: (PdfPageFormat format) async => bytes,
+    //   );
+    // }
   }
 }
